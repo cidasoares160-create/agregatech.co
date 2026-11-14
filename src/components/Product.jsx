@@ -7,7 +7,7 @@ import { Modal, Quantity } from './UI';
 
 export function ProductImage({ product, eager = false }) {
   const gradient = useId().replace(/:/g, '');
-  if (product.image) return <div className="product-photo"><img src={product.image} alt={product.name} loading={eager ? 'eager' : 'lazy'} decoding="async" style={{ left: product.quadrant % 2 ? '-100%' : 0, top: product.quadrant > 1 ? '-100%' : 0 }} /></div>;
+  if (product.image) return <div className="product-photo"><img src={product.image} alt={product.name} loading={eager ? 'eager' : 'lazy'} decoding="async" style={product.imageMode === 'single' ? { width: '100%', height: '100%', objectFit: 'cover', left: 0, top: 0 } : { left: product.quadrant % 2 ? '-100%' : 0, top: product.quadrant > 1 ? '-100%' : 0 }} /></div>;
   return <div className="product-photo product-illustration"><svg viewBox="0 0 240 240" role="img" aria-label={`Illustration de ${product.name}`}>
     <defs><linearGradient id={gradient} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#a67c35" /><stop offset=".4" stopColor="#eed7a0" /><stop offset=".65" stopColor="#bc944e" /><stop offset="1" stopColor="#e2c78d" /></linearGradient></defs>
     <g fill="none" stroke={`url(#${gradient})`} strokeWidth="5" strokeLinecap="round">
@@ -27,9 +27,11 @@ export function ProductCard({ product, onDetails }) {
     <div className="product-info"><span className="eyebrow">{product.category}</span><button className="product-name" onClick={() => onDetails(product)}>{product.name}</button><p className="product-short">{product.detail}</p><div className="product-price">{product.originalPrice > product.price && <del>{money(product.originalPrice)}</del>}<strong>{money(product.price)}</strong></div><div className="product-card-bottom"><span className={product.stock > 0 ? 'stock-label' : 'muted'}>{product.stock > 0 ? `${product.stock} disponíveis` : 'Indisponível'}</span><button className="add-button" disabled={full} onClick={() => add(product.id)} aria-label={`Adicionar ${product.name} à sacola`}>{full && product.stock > 0 ? <Check size={17} /> : <ShoppingBag size={17} />}<span>{full ? (product.stock ? 'Na sacola' : 'Esgotado') : 'Adicionar'}</span></button></div></div>
   </article>;
 }
-export function ProductDetails({ product, onClose }) {
+export function ProductDetails({ product: selectedProduct, onClose }) {
   const [amount, setAmount] = useState(1);
-  const { add, lines } = useStore();
+  const { add, lines, products } = useStore();
+  const product = products.find(p => p.id === selectedProduct.id && p.active);
+  if (!product) return <Modal title="Produto indisponível" onClose={onClose}><p className="modal-intro">Este produto não está mais disponível na coleção. Explore as outras peças da loja.</p><button className="button" onClick={onClose}>Voltar à coleção</button></Modal>;
   const remaining = product.stock - (lines.find(p => p.id === product.id)?.quantity || 0);
   return <Modal title="Um detalhe que faz a diferença" onClose={onClose} wide><div className="product-detail"><ProductImage product={product} eager /><div><span className="eyebrow">{product.category} · Coleção Aura</span><h3>{product.name}</h3><p>{product.description}</p><p className="detail-spec">{product.detail}</p><div className="product-price large">{product.originalPrice > product.price && <del>{money(product.originalPrice)}</del>}<strong>{money(product.price)}</strong></div><p className="stock-label">{product.stock ? `${product.stock} unidades no estoque demonstrativo` : 'Produto indisponível'}</p><div className="detail-purchase">{remaining > 0 && <Quantity value={Math.min(amount, remaining)} max={remaining} onChange={setAmount} />}<button className="button" disabled={remaining <= 0} onClick={() => { add(product.id, Math.min(amount, remaining)); }}>{remaining > 0 ? 'Adicionar à sacola' : product.stock ? 'Limite do estoque na sacola' : 'Esgotado'}<ShoppingBag size={17} /></button></div><Link to="/sacola" className="text-link" onClick={onClose}>Ir para minha sacola <ArrowUpRight size={16} /></Link><p className="fine-print">Produto de demonstração. A inclusão na sacola não reserva estoque nem confirma uma compra.</p></div></div></Modal>;
 }

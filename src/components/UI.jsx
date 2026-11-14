@@ -6,7 +6,7 @@ import { useStore } from '../store/StoreContext';
 export function Brand({ store = false }) {
   const { settings } = useStore();
   return <Link to={store ? '/loja' : '/'} className={`brand ${store ? 'brand-store' : ''}`} aria-label={store ? settings.name : 'Minha Loja Inteligente — início'}>
-    <span className="brand-mark"><Sparkles size={24} strokeWidth={1.5} /></span>
+    <span className="brand-mark">{store && settings.logo ? <img src={settings.logo} alt="" className="store-logo" /> : <Sparkles size={24} strokeWidth={1.5} />}</span>
     {store ? <span className="store-wordmark">{settings.name}<small>JOIAS & ACESSÓRIOS</small></span> : <span>MINHA LOJA<small>INTELIGENTE</small></span>}
   </Link>;
 }
@@ -20,14 +20,16 @@ export function Header({ store = false, onConfigure, onContact }) {
         <NavLink to="/" end>{store ? 'Central de acesso' : 'Início'}</NavLink>
         <NavLink to="/loja">{store ? 'Coleção completa' : 'Loja demonstrativa'}</NavLink>
         <button onClick={onContact}>Fale conosco</button>
+        <NavLink to="/painel">Painel demonstrativo</NavLink>
       </nav>
       <div className="header-actions">{store ? <Link to="/sacola" className="bag-button" aria-label={`Abrir sacola, ${count} itens`}><ShoppingBag size={21} /><span className="hide-small">Minha sacola</span><span className="bag-count">{count}</span></Link> : <Link to="/loja" className="button button-small">Conhecer a loja <ArrowUpRight size={16} /></Link>}</div>
     </div></header>
+    <Link to="/painel" className="admin-mobile-entry"><Settings2 size={15} /> Explorar painel demonstrativo <ArrowUpRight size={14} /></Link>
     {store && <nav className="mobile-store-nav" aria-label="Navegação no celular"><Link to="/"><ArrowLeft size={13} /> Central de acesso</Link><button onClick={onContact}>Fale conosco <ArrowUpRight size={13} /></button></nav>}
   </>;
 }
 export function Footer({ onConfigure, onContact }) {
-  return <footer className="site-footer"><div className="container footer-inner"><Brand /><p>Tecnologia para conectar. Liberdade para crescer.</p><div><button onClick={onContact}>Atendimento</button><button onClick={onConfigure}>Configurar demo</button></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Minha Loja Inteligente</span><span><ShieldCheck size={14} /> Ambiente demonstrativo · Dados salvos neste navegador</span></div></footer>;
+  return <footer className="site-footer"><div className="container footer-inner"><Brand /><p>Tecnologia para conectar. Liberdade para crescer.</p><div><Link to="/painel" className="text-link">Painel demonstrativo</Link><button onClick={onContact}>Atendimento</button><button onClick={onConfigure}>Configurar demo</button></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Minha Loja Inteligente</span><span><ShieldCheck size={14} /> Ambiente demonstrativo · Dados salvos neste navegador</span></div></footer>;
 }
 export function Modal({ title, children, onClose, wide = false }) {
   const dialog = useRef(null);

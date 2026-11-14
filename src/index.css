@@ -522,6 +522,26 @@ svg { flex-shrink: 0; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+/* Personalização da loja pública: sobrescreve os estados fixos anteriores. */
+.public-experience .button:not(.button-outline):hover:not(:disabled) { background: var(--primary); filter: brightness(1.1); }
+.store-logo { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+.store-campaigns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; margin-top: 24px; }
+.store-campaigns article { padding: 23px; border: 1px solid var(--border); border-radius: 12px; background: var(--secondary); }
+.store-campaigns h2 { font-family: var(--font-editorial); font-weight: 400; font-size: 25px; margin: 7px 0; }
+.store-campaigns p { color: var(--muted); font-size: 11px; margin-top: 7px; }
+.store-campaigns small { font-size: 10px; color: var(--muted); display: block; }
+.store-campaign-products { display: flex; flex-wrap: wrap; gap: 7px; margin-block: 14px; }
+.store-campaign-products .category-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--card); font-size: 10px; }
+.store-policies { flex-wrap: wrap; }
+.store-policies p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.store-image-label small { max-width: 280px; }
+.admin-mobile-entry { display: none; }
+@media (max-width: 1100px) { .desktop-nav { gap: 15px; font-size: 11px; } }
+@media (max-width: 720px) {
+  .admin-mobile-entry { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; font-size: 11px; background: var(--secondary); border-bottom: 1px solid var(--border); }
+  .footer-inner > div { flex-wrap: wrap; }
+}
+
 
 
 
