@@ -1,2 +1,11 @@
-# agregatech.co
-Criado com GeckoAI
+# Agregatech Co
+
+Criado com GeckoAI — cada prompt vira um commit.
+
+## Rodar localmente
+```bash
+npm install
+npm run dev
+```
+
+Publicado na Vercel: todo push no branch principal vira um deploy.
