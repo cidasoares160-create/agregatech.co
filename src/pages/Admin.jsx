@@ -7,10 +7,13 @@ import AdminProducts from './admin/Products';
 import AdminPromotions from './admin/Promotions';
 import { AdminOrders, AdminCustomers } from './admin/Operations';
 import AdminSettings from './admin/Settings';
+import Referrals from './admin/Referrals';
+import { CommercialSettings, Marketing, Notifications } from './admin/GrowthTools';
+import { Bell, Gift, Megaphone, QrCode } from 'lucide-react';
 import './admin/admin.css';
 
 const sessionKey = 'minha-loja:demo-session';
-const nav = [['', 'Visão geral', LayoutDashboard], ['produtos', 'Produtos & estoque', Boxes], ['promocoes', 'Promoções', Tag], ['pedidos', 'Pedidos', ShoppingBag], ['clientes', 'Clientes', Users], ['configuracoes', 'Minha loja', Settings2]];
+const nav = [['', 'Visão geral', LayoutDashboard], ['produtos', 'Produtos & estoque', Boxes], ['promocoes', 'Promoções', Tag], ['pedidos', 'Pedidos', ShoppingBag], ['clientes', 'Clientes', Users], ['indicacoes', 'Indique e ganhe', Gift], ['divulgacao', 'Estúdio de divulgação', Megaphone], ['notificacoes', 'Notificações', Bell], ['placa', 'Placa & proposta', QrCode], ['configuracoes', 'Minha loja', Settings2]];
 function inSession() { try { return sessionStorage.getItem(sessionKey) === 'demo'; } catch { return false; } }
 export default function Admin() {
   const { settings } = useStore();
@@ -28,6 +31,6 @@ export default function Admin() {
     <div className="admin-sidebar-bottom"><CircleHelp size={21} /><strong>Um espaço para experimentar.</strong><p>Todos os registros são demonstrativos. Nada aqui representa pagamento real.</p><Link to="/loja">Visitar a loja <ArrowUpRight size={15} /></Link><button onClick={leave}><LogOut size={16} /> Sair da demonstração</button></div>
   </aside><div className="admin-main"><header className="admin-topbar"><div><span>Workspace</span><span>/</span><strong>{current}</strong></div><Link to="/loja" className="button button-outline button-small">Ver minha loja <ArrowUpRight size={15} /></Link></header>
     <div className="admin-demo"><span className="live-dot" /><strong>MODO DEMONSTRAÇÃO</strong><span>Dados fictícios · Salvos somente neste navegador · Sem pagamento online</span><button onClick={leave} aria-label="Sair da demonstração"><LogOut size={16} /></button></div>
-    <main id="conteudo" className="admin-content"><Routes><Route index element={<Dashboard />} /><Route path="produtos" element={<AdminProducts />} /><Route path="promocoes" element={<AdminPromotions />} /><Route path="pedidos" element={<AdminOrders />} /><Route path="clientes" element={<AdminCustomers />} /><Route path="configuracoes" element={<AdminSettings />} /><Route path="*" element={<Navigate to="/painel" replace />} /></Routes></main><footer className="admin-footer">Minha Loja Inteligente <span>Operação local de apresentação · {new Date().getFullYear()}</span></footer>
+    <main id="conteudo" className="admin-content"><Routes><Route index element={<Dashboard />} /><Route path="produtos" element={<AdminProducts />} /><Route path="promocoes" element={<AdminPromotions />} /><Route path="pedidos" element={<AdminOrders />} /><Route path="clientes" element={<AdminCustomers />} /><Route path="indicacoes" element={<Referrals />} /><Route path="divulgacao" element={<Marketing />} /><Route path="notificacoes" element={<Notifications />} /><Route path="placa" element={<CommercialSettings />} /><Route path="configuracoes" element={<AdminSettings />} /><Route path="*" element={<Navigate to="/painel" replace />} /></Routes></main><footer className="admin-footer">Minha Loja Inteligente <span>Operação local de apresentação · {new Date().getFullYear()}</span></footer>
   </div></div>;
 }

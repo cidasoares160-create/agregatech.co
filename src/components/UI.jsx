@@ -29,7 +29,7 @@ export function Header({ store = false, onConfigure, onContact }) {
   </>;
 }
 export function Footer({ onConfigure, onContact }) {
-  return <footer className="site-footer"><div className="container footer-inner"><Brand /><p>Tecnologia para conectar. Liberdade para crescer.</p><div><Link to="/painel" className="text-link">Painel demonstrativo</Link><button onClick={onContact}>Atendimento</button><button onClick={onConfigure}>Configurar demo</button></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Minha Loja Inteligente</span><span><ShieldCheck size={14} /> Ambiente demonstrativo · Dados salvos neste navegador</span></div></footer>;
+  return <footer className="site-footer"><div className="container footer-inner"><Brand /><p>Tecnologia para conectar. Liberdade para crescer.</p><div><Link to="/indique" className="text-link">Indique e ganhe</Link><Link to="/solucao" className="text-link">Conheça a solução</Link><Link to="/painel" className="text-link">Painel demonstrativo</Link><button onClick={onContact}>Atendimento</button><button onClick={onConfigure}>Configurar demo</button></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Minha Loja Inteligente</span><span><ShieldCheck size={14} /> Ambiente demonstrativo · Dados salvos neste navegador</span></div></footer>;
 }
 export function Modal({ title, children, onClose, wide = false }) {
   const dialog = useRef(null);

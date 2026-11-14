@@ -6,7 +6,7 @@ import { money } from '../../data/demo';
 import { dateLabel, Empty, PageHeading, Status } from '../../components/AdminUI';
 
 export default function Dashboard() {
-  const { settings, orders, customers, rawProducts, clock } = useStore();
+  const { settings, orders, customers, rawProducts, clock, referrals, rewards } = useStore();
   const [period, setPeriod] = useState('30');
   const start = period === 'all' ? 0 : clock - Number(period) * 86400000;
   const completed = orders.filter(o => o.status === 'concluido' && new Date(o.completedAt || o.createdAt).getTime() >= start);
@@ -29,8 +29,12 @@ export default function Dashboard() {
     ['Estoque baixo', low.length, 'Ativos com até 3 unidades · agora'],
     ['Clientes cadastradas', customers.length, 'Base total neste navegador'],
     ['Novas clientes', customers.filter(c => new Date(c.createdAt).getTime() >= start).length, 'Cadastros no período selecionado'],
+    ['Indicações registradas', referrals.filter(r => new Date(r.createdAt).getTime() >= start).length, 'Registros no período · visitas não contam'],
+    ['Indicações convertidas', referrals.filter(r => r.status === 'convertida' && new Date(r.convertedAt).getTime() >= start).length, 'Primeiras compras elegíveis concluídas'],
+    ['Benefícios conquistados', rewards.filter(r => new Date(r.createdAt).getTime() >= start).length, 'Lotes únicos liberados no período'],
   ];
   return <>
+    <nav className="growth-shortcuts" aria-label="Ferramentas de crescimento"><Link className="text-link" to="/painel/indicacoes">Indique e ganhe <ArrowUpRight size={15} /></Link><Link className="text-link" to="/painel/divulgacao">Estúdio de divulgação <ArrowUpRight size={15} /></Link><Link className="text-link" to="/painel/notificacoes">Central de notificações <ArrowUpRight size={15} /></Link><Link className="text-link" to="/painel/placa">Placa & proposta <ArrowUpRight size={15} /></Link></nav>
     <PageHeading eyebrow="UM OLHAR SOBRE SUAS POSSIBILIDADES" title="Seu negócio, em perspectiva." description={`${settings.name} · Acompanhe o que importa e escolha seu próximo passo.`}><label className="admin-period"><span>Período</span><select value={period} onChange={e => setPeriod(e.target.value)}><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo o histórico</option></select></label></PageHeading>
     <div className="admin-revenue-row"><section className="admin-revenue"><span className="eyebrow">FATURAMENTO DEMONSTRATIVO</span><strong>{money(revenue)}</strong><p>Soma dos pedidos concluídos no período.<br />Não representa recebimento financeiro verificado.</p><div><span>{completed.length} vendas concluídas</span><span>Ticket médio <b>{money(completed.length ? Math.round(revenue / completed.length) : 0)}</b></span></div></section><section className="admin-panel admin-discount"><span className="round-icon"><Tag size={24} /></span><span className="eyebrow">DESCONTOS CONCEDIDOS</span><strong>{money(discounts)}</strong><p>Economia nos pedidos concluídos no período. Promoções aplicadas sem acumular descontos.</p><Link className="text-link" to="/painel/promocoes">Gerenciar campanhas <ArrowUpRight size={15} /></Link></section></div>
     <div className="admin-metrics">{metrics.map(([label, value, help]) => <article className="admin-metric" key={label}><span>{label}</span><strong>{value}</strong><small>{help}</small></article>)}</div>

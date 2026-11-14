@@ -1,4 +1,5 @@
 import { STORE_ID, phoneKey, validPhone, validStorePhone, transitions } from '../data/demo.js';
+import { withGrowth, reconcileGrowth, redeemReward, validateGrowth } from './growth.js';
 
 const stamp = () => new Date().toISOString();
 const fail = message => { throw new Error(message); };
@@ -6,7 +7,21 @@ const finite = value => Number.isFinite(value);
 export function imageAllowed(value) {
   return !value || /^data:image\/(png|jpeg|webp);base64,/.test(value) || /^\/images\/[\w.-]+$/.test(value) || /^https:\/\//.test(value);
 }
-export function operate(state, action, data) {
+export function operate(original, action, data) {
+  const state = withGrowth(original);
+  if (action === 'reward') return reconcileGrowth(redeemReward(state, data));
+  if (action === 'referralCode') return { ...state, referralCode: String(data || '').trim().toUpperCase().slice(0, 32) };
+  if (action === 'readAlerts') return { ...state, readAlerts: [...new Set([...state.readAlerts, ...data])].slice(-1000) };
+  if (action === 'marketing') return { ...state, marketingDrafts: { ...state.marketingDrafts, [data.key]: String(data.text).slice(0, 6000) } };
+  if (action === 'settings') {
+    data = { ...state.settings, ...data, referralRules: { ...state.settings.referralRules, ...data.referralRules } };
+    validateGrowth(data);
+  }
+  if (action === 'customer' && data.id) data = { ...data, referralCode: state.customers.find(c => c.id === data.id)?.referralCode };
+  if (action === 'deleteCustomer' && (state.referrals.some(r => r.customerId === data || r.referrerId === data) || state.rewards.some(r => r.customerId === data))) fail('Esta cliente tem histórico de indicações ou benefícios e não pode ser excluída.');
+  return reconcileGrowth(baseOperate(state, action, data));
+}
+function baseOperate(state, action, data) {
   if (action === 'product') {
     const product = { ...data, name: data.name.trim(), category: data.category.trim(), updatedAt: stamp(), storeId: STORE_ID };
     if (product.name.length < 2 || !product.category || !product.description.trim()) fail('Preencha nome, categoria e descrição.');

@@ -8,6 +8,7 @@ import Access from './pages/Access';
 import Store from './pages/Store';
 import Bag from './pages/Bag';
 import Admin from './pages/Admin';
+import { ReferralBanner, ReferralPage, SolutionPage, SolutionPreview } from './components/Growth';
 
 // Preserve readable contrast even when the representative chooses a light brand color.
 function brandTheme(color) {
@@ -37,8 +38,10 @@ function Experience() {
     <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
     {!isAdmin && <Header store={pathname !== '/'} onConfigure={configure} onContact={contact} />}
     <Routes>
-      <Route path="/" element={<Access onContact={contact} />} />
-      <Route path="/loja" element={<Store onContact={contact} />} />
+      <Route path="/" element={<><Access onContact={contact} /><SolutionPreview /></>} />
+      <Route path="/loja" element={<><Store onContact={contact} /><ReferralBanner /></>} />
+      <Route path="/indique" element={<ReferralPage />} />
+      <Route path="/solucao" element={<SolutionPage onContact={contact} />} />
       <Route path="/sacola" element={<Bag onConfigure={configure} />} />
       <Route path="/painel/*" element={<Admin />} />
       <Route path="*" element={<main id="conteudo" className="container empty-state not-found"><span className="eyebrow">ESTE CAMINHO AINDA NÃO EXISTE</span><h1>Vamos voltar<br />a um bom começo?</h1><p>A página procurada não foi encontrada.</p><Link to="/" className="button"><ArrowLeft size={17} /> Ir à central de acesso</Link></main>} />

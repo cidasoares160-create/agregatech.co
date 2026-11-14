@@ -1,11 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { initialState, migrateState, STORAGE_KEY, STORE_ID, phoneKey, activePromotions, discountedProduct } from '../data/demo';
 import { operate } from './operations';
+import { attachReferral, reconcileGrowth, withGrowth } from './growth.js';
+import { useLocation } from 'react-router-dom';
 
 const StoreContext = createContext(null);
 function load() {
-  try { return migrateState(JSON.parse(localStorage.getItem(STORAGE_KEY))); }
-  catch { return initialState(); }
+  let saved;
+  try { saved = migrateState(JSON.parse(localStorage.getItem(STORAGE_KEY))); }
+  catch { saved = initialState(); }
+  return reconcileGrowth(saved);
 }
 export function StoreProvider({ children }) {
   const [state, setState] = useState(load);
@@ -13,6 +17,11 @@ export function StoreProvider({ children }) {
   const [notice, setNotice] = useState('');
   const [storageError, setStorageError] = useState(false);
   const [clock, setClock] = useState(Date.now());
+  const { search } = useLocation();
+  useEffect(() => {
+    const code = new URLSearchParams(search).get('ref');
+    if (code) commit(s => operate(s, 'referralCode', code));
+  }, [search]);
   function commit(update) {
     const next = update(current.current);
     current.current = next;
@@ -70,11 +79,13 @@ export function StoreProvider({ children }) {
     setNotice('Configuração salva neste navegador.');
   }
   function saveDraft(customer) {
-    const fingerprint = JSON.stringify({ lines: lines.map(p => [p.id, p.quantity, p.price]), customer });
+    const code = current.current.referralCode;
+    const fingerprint = JSON.stringify({ lines: lines.map(p => [p.id, p.quantity, p.price]), customer, code });
     const existing = current.current.orders.find(o => o.fingerprint === fingerprint && o.status === 'rascunho');
     if (existing) return existing;
     let order;
     commit(s => {
+      if (!lines.length) throw new Error('Adicione produtos disponíveis à sacola.');
       const at = new Date().toISOString();
       let profile = s.customers.find(c => phoneKey(c.phone) === phoneKey(customer.phone));
       const customers = [...s.customers];
@@ -83,11 +94,12 @@ export function StoreProvider({ children }) {
         customers.push(profile);
       }
       order = { id: crypto.randomUUID(), storeId: STORE_ID, createdAt: at, status: 'rascunho', customerId: profile.id,
-        demo: true, customer, lines: lines.map(p => ({ productId: p.id, name: p.name, price: p.price, originalPrice: p.originalPrice, quantity: p.quantity })),
+        demo: true, customer, referralCode: code, lines: lines.map(p => ({ productId: p.id, name: p.name, price: p.price, originalPrice: p.originalPrice, quantity: p.quantity })),
         subtotal, discount: subtotal - total, total, fingerprint, stockReserved: false,
         history: [{ status: 'rascunho', at, note: 'Mensagem preparada na sacola. Envio e compra não confirmados.' }],
       };
-      return { ...s, customers, orders: [order, ...s.orders] };
+      const next = attachReferral(withGrowth({ ...s, customers }), order, code);
+      return { ...next, orders: [order, ...s.orders] };
     });
     return order;
   }
